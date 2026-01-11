@@ -19,7 +19,7 @@ while true; do
     
     # Root CA 존재 여부에 따른 상태 표시
     if [[ -f "$ROOT_CRT" ]]; then
-        EXISTING_CN=$(openssl x509 -noout -subject -in "$ROOT_CRT" | sed -n 's/.*CN = //p')
+        EXISTING_CN=$(openssl x509 -noout -subject -in "$ROOT_CRT" | sed -n 's/.*CN=//p')
         echo " [상태] Root CA 설치됨 (CN: $EXISTING_CN)"
         echo " 1. 서버용 인증서 생성 (서버 도메인 입력)"
     else
