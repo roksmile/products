@@ -11,8 +11,8 @@ echo "========================================"
 # 2. 미러링 대상 선택 받기
 echo "미러링할 항목을 선택하세요:"
 echo "1) ocp"
-echo "2) redhat (redhat-olm)"
-echo "3) certified (certified-olm)"
+echo "2) redhat (olm-redhat)"
+echo "3) certified (olm-certified)"
 read -p "선택 (1/2/3 또는 이름 입력): " SELECTION
 
 case $SELECTION in
@@ -22,14 +22,14 @@ case $SELECTION in
         DEFAULT_DESTINATION="./ocp"
         ;;
     2|redhat)
-        TARGET_NAME="redhat-olm"
-        ISC_FILE="redhat-olm/redhat-olm-isc.yaml" # 파일명이 다를 경우 수정하세요
-        DEFAULT_DESTINATION="./redhat-olm"
+        TARGET_NAME="olm-redhat"
+        ISC_FILE="olm-redhat/olm-redhat-isc.yaml" # 파일명이 다를 경우 수정하세요
+        DEFAULT_DESTINATION="./olm-redhat"
         ;;
     3|certified)
-        TARGET_NAME="certified-olm"
-        ISC_FILE="certified-olm/certified-olm-isc.yaml" # 파일명이 다를 경우 수정하세요
-        DEFAULT_DESTINATION="./certified-olm"
+        TARGET_NAME="olm-certified"
+        ISC_FILE="olm-certified/olm-certified-isc.yaml" # 파일명이 다를 경우 수정하세요
+        DEFAULT_DESTINATION="./olm-certified"
         ;;
     *)
         echo "[오류] 잘못된 선택입니다. 스크립트를 종료합니다."
