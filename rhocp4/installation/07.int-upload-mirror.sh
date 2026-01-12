@@ -18,7 +18,7 @@ run_ocp() {
 
 run_olm_redhat() {
     echo -e "${YELLOW}>>> [2/3] OLM RedHat Mirroring 시작...${NC}"
-    oc-mirror --v2 --dest-tls-verify=false --config olm-redhat/olm-redhat.yaml --from file://$PWD/olm-redhat docker://nexus.rok.lab:5000/olm-redhat --cache-dir ./cache
+    oc-mirror --v2 --dest-tls-verify=false --config olm-redhat/olm-redhat-isc.yaml --from file://$PWD/olm-redhat docker://nexus.rok.lab:5000/olm-redhat --cache-dir ./cache
 }
 
 run_olm_certified() {
