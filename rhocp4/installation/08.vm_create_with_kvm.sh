@@ -81,17 +81,8 @@ for DATA in "${VM_DATA_LIST[@]}"; do
         --cdrom "$ISO_PATH" \
         --os-variant "$OS_VARIANT" \
         --graphics vnc \
-        --boot hd,cdrom \
-        --print-xml --dry-run > "/tmp/${VM_NAME}.xml"
-
-    # XML을 통한 정의
-    virsh define "/tmp/${VM_NAME}.xml" > /dev/null
-    
-    if [ $? -eq 0 ]; then
-        echo "결과: VM $VM_NAME 정의 완료 (상태: 정지)"
-    else
-        echo "결과: VM $VM_NAME 정의 실패"
-    fi
-
-    rm -f "/tmp/${VM_NAME}.xml"
+        --noautoconsole \
+        --boot hd,cdrom
+        
+    echo "VM $VM_NAME 생성 시도가 완료되었습니다."
 done
