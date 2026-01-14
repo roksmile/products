@@ -6,6 +6,29 @@ DISK_BASE_DIR="/data/vm"
 BRIDGE_NAME="virbr0" 
 OS_VARIANT="rhel9.4" # RHEL 9.7 용
 
+# 2. 필수 환경 체크 (Validation)
+echo "사전 환경 체크 중..."
+
+# ISO 파일 존재 여부 확인
+if [ ! -f "$ISO_PATH" ]; then
+    echo "[ERROR] ISO 파일이 존재하지 않습니다: $ISO_PATH" >&2
+    exit 1
+fi
+
+# 디스크 디렉토리 존재 여부 확인
+if [ ! -d "$DISK_BASE_DIR" ]; then
+    echo "[ERROR] 디스크 저장 디렉토리가 존재하지 않습니다: $DISK_BASE_DIR" >&2
+    exit 1
+fi
+
+# 네트워크 브릿지 존재 여부 확인 (ip link 명령 사용)
+if ! ip link show "$BRIDGE_NAME" > /dev/null 2>&1; then
+    echo "[ERROR] 네트워크 브릿지가 시스템에 존재하지 않습니다: $BRIDGE_NAME" >&2
+    exit 1
+fi
+
+echo "체크 완료: 모든 환경이 정상입니다."
+
 # 2. 대상 VM 리스트 (데이터 포맷: 이름-CPU-RAM-DISK-NIC개수-[MAC1,MAC2,...])
 VM_DATA_LIST=(
     "kscada.mst01-8-32-120-1-[52:54:00:d7:7c:11,]"
