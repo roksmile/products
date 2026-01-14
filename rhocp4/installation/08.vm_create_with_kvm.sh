@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # 1. 환경 설정
-ISO_PATH="/data/iso/agent_3.2.iso"
-DISK_BASE_DIR="/data/vm"
-BRIDGE_NAME="virbr0" 
+ISO_PATH="/data/iso/kscada-v4.20.4_agent.x86_64.iso"
+DISK_BASE_DIR="/data/vms"
+BRIDGE_NAME="hostbr0" 
 OS_VARIANT="rhel9.4" # RHEL 9.7 용
 
 # 2. 필수 환경 체크 (Validation)
