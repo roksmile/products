@@ -26,11 +26,11 @@ EOF
 
 # 함수 정의: Certified OLM ISC 생성
 create_certified() {
-    if [ ! -d "certified-olm" ]; then
-        mkdir certified-olm
-        echo "'certified-olm' 디렉토리를 생성했습니다."
+    if [ ! -d "olm-certified" ]; then
+        mkdir olm-certified
+        echo "'olm-certified' 디렉토리를 생성했습니다."
     fi
-    cat <<EOF > certified-olm/certified-olm-isc.yaml
+    cat <<EOF > olm-certified/olm-certified-isc.yaml
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
 mirror:
@@ -41,20 +41,20 @@ mirror:
       channels:
       - name: stable
 EOF
-    echo ">> 파일 생성 완료: certified-olm/certified-olm-isc.yaml"
+    echo ">> 파일 생성 완료: olm-certified/olm-certified-isc.yaml"
 }
 
 # 함수 정의: RedHat OLM ISC 생성
 create_redhat() {
-    if [ ! -d "redhat-olm" ]; then
-        mkdir redhat-olm
-        echo "'redhat-olm' 디렉토리를 생성했습니다."
+    if [ ! -d "olm-redhat" ]; then
+        mkdir olm-redhat
+        echo "'olm-redhat' 디렉토리를 생성했습니다."
     fi
 
     echo -n "RHOV(OpenShift Virtualization) 용도로 사용하시겠습니까? (y/n): "
     read RHOV_ANS
 
-    cat <<EOF > redhat-olm/redhat-olm-isc.yaml
+    cat <<EOF > olm-redhat/olm-redhat-isc.yaml
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
 mirror:
@@ -103,7 +103,7 @@ mirror:
 EOF
 
     if [[ "$RHOV_ANS" =~ ^[yY]$ ]]; then
-        cat <<EOF >> redhat-olm/redhat-olm-isc.yaml
+        cat <<EOF >> olm-redhat/olm-redhat-isc.yaml
     - name: kubevirt-hyperconverged
     - name: local-storage-operator
     - name: metallb-operator
@@ -116,15 +116,15 @@ EOF
 EOF
         echo ">> RHOV 관련 Operator 설정이 추가되었습니다."
     fi
-    echo ">> 파일 생성 완료: redhat-olm/redhat-olm-isc.yaml"
+    echo ">> 파일 생성 완료: olm-redhat/olm-redhat-isc.yaml"
 }
 
 # 2. 메뉴 선택
 echo "------------------------------------------"
 echo "생성할 설정을 선택하세요:"
 echo "1) OCP Platform (ocp-isc.yaml)"
-echo "2) Certified OLM (certified-olm-isc.yaml)"
-echo "3) RedHat OLM (redhat-olm-isc.yaml)"
+echo "2) Certified OLM (olm-certified-isc.yaml)"
+echo "3) RedHat OLM (olm-redhat-isc.yaml)"
 echo "4) 전체 생성 (All)"
 echo "------------------------------------------"
 echo -n "선택 (1-4): "
