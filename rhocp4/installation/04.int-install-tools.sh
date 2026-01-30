@@ -10,7 +10,7 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
-echo "🚀 OpenShift 관련 도구 설치를 시작합니다..."
+echo "OpenShift 관련 도구 설치를 시작합니다..."
 
 ---
 
@@ -18,9 +18,9 @@ echo "🚀 OpenShift 관련 도구 설치를 시작합니다..."
 if [ -f "$SRC_DIR/butane-amd64" ]; then
     cp "$SRC_DIR/butane-amd64" "$DEST_DIR/butane"
     chmod 755 "$DEST_DIR/butane"
-    echo "✅ butane 설치 완료 (/usr/local/bin/butane)"
+    echo "butane 설치 완료 (/usr/local/bin/butane)"
 else
-    echo "⚠️ butane-amd64 파일을 찾을 수 없습니다."
+    echo " butane-amd64 파일을 찾을 수 없습니다."
 fi
 
 # 3. 나머지 .tar.gz 압축 파일 처리
@@ -35,14 +35,14 @@ for FILE in "${TAR_FILES[@]}"; do
     FILE_PATH="$SRC_DIR/$FILE"
     
     if [ -f "$FILE_PATH" ]; then
-        echo "📦 $FILE 압축 해제 중..."
+        echo "$FILE 압축 해제 중..."
         
         # README.md를 제외하고 /usr/local/bin에 직접 압축 해제
         tar -xzf "$FILE_PATH" -C "$DEST_DIR" --exclude='README.md'
         
-        echo "✅ $FILE 설치 완료."
+        echo "$FILE 설치 완료."
     else
-        echo "⚠️ $FILE_PATH 파일을 찾을 수 없습니다."
+        echo "$FILE_PATH 파일을 찾을 수 없습니다."
     fi
 done
 
@@ -51,6 +51,6 @@ done
 chmod 755 $DEST_DIR/butane $DEST_DIR/oc $DEST_DIR/kubectl $DEST_DIR/oc-mirror $DEST_DIR/openshift-install 2>/dev/null
 
 echo "---"
-echo "🎉 모든 작업이 완료되었습니다! 설치된 버전들을 확인하세요."
+echo "모든 작업이 완료되었습니다! 설치된 버전들을 확인하세요."
 $DEST_DIR/butane --version | head -n 1
 $DEST_DIR/oc version --client

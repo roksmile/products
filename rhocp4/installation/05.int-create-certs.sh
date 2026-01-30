@@ -34,11 +34,11 @@ while true; do
         1)
             # --- CASE A: Root CA가 없는 경우 (Root 생성) ---
             if [[ ! -f "$ROOT_CRT" ]]; then
-                read -p "👉 Root CA의 기반이 될 베이스 도메인을 입력하세요: " BASE_DOMAIN
+                read -p "Root CA의 기반이 될 베이스 도메인을 입력하세요: " BASE_DOMAIN
                 
                 # 유효성 검사
                 if [[ ! $BASE_DOMAIN =~ ^[a-zA-Z1-9.-]+\.[a-zA-Z]{2,}$ ]]; then
-                    echo "❌ 오류: 유효하지 않은 도메인 형식입니다."
+                    echo "오류: 유효하지 않은 도메인 형식입니다."
                     continue
                 fi
 
@@ -52,21 +52,21 @@ while true; do
                 openssl req -x509 -new -nodes -key "$ROOT_KEY" -sha256 -days 3650 \
                     -out "$ROOT_CRT" -subj "$SUBJECT_ROOT" 2>/dev/null
                 
-                echo "✅ Root CA 생성 완료!"
+                echo "Root CA 생성 완료!"
                 continue # 생성 후 다시 메뉴로 이동
             fi
 
             # --- CASE B: Root CA가 있는 경우 (서버 인증서 생성) ---
             echo ""
-            read -p "👉 서버용 인증서를 발급할 도메인을 입력하세요 (와일드카드 가능): " SERVER_DOMAIN
+            read -p "서버용 인증서를 발급할 도메인을 입력하세요 (와일드카드 가능): " SERVER_DOMAIN
 
             # 와일드카드 포함 유효성 검사
             if [[ ! $SERVER_DOMAIN =~ ^(\*\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
-                echo "❌ 오류: 유효하지 않은 도메인 형식입니다."
+                echo "오류: 유효하지 않은 도메인 형식입니다."
                 continue
             fi
 
-            echo "--- 🚀 $SERVER_DOMAIN 용 서버 인증서 발급 중 (10년) ---"
+            echo "--- $SERVER_DOMAIN 용 서버 인증서 발급 중 (10년) ---"
             
             # 파일명 안전 처리 (* -> wildcard)
             FILE_NAME=$(echo "$SERVER_DOMAIN" | sed 's/\*/wildcard/g')
@@ -97,8 +97,8 @@ EOF
                 -out "$SERVER_CRT" -days 3650 -sha256 -extfile "$EXT_FILE" 2>/dev/null
 
             echo "------------------------------------------------"
-            echo "✨ 서버 인증서 발행 완료!"
-            echo "📍 파일 위치: $SERVER_CRT"
+            echo "서버 인증서 발행 완료!"
+            echo "파일 위치: $SERVER_CRT"
             echo "------------------------------------------------"
 
             # 임시 파일 정리
@@ -106,12 +106,12 @@ EOF
             ;;
             
         2)
-            echo "👋 프로그램을 종료합니다."
+            echo "프로그램을 종료합니다."
             exit 0
             ;;
             
         *)
-            echo "❌ 잘못된 입력입니다."
+            echo "잘못된 입력입니다."
             ;;
     esac
 done
