@@ -1,14 +1,18 @@
 {
     "cSpell.words": [
+        "Acreateserial",
         "devworkspace",
+        "extfile",
         "gitops",
         "healthcheck",
         "hyperconverged",
+        "keyid",
         "kubevirt",
         "lvms",
         "metallb",
         "netobserv",
         "nmstate",
+        "noout",
         "oadp",
         "rhbk",
         "RHOV"

@@ -17,19 +17,17 @@ NEXUS_IMAGE="docker.io/sonatype/nexus3:latest"
 HTTPS_PORT="8443"
 CUSTOM_PORTS=("5000" "5001")
 MEM_TOTAL="4096"
+BASE_HOME="/opt/nexus"
+DATA_DIR="/data/nexus"
 
 # 실행 계정 감지 및 환경 설정
 if [[ $EUID -eq 0 ]]; then
     IS_ROOT=true
-    BASE_HOME="/opt/nexus"
-    DATA_DIR="/data/nexus"
     SCTL="systemctl"
     SVC_DIR="/etc/systemd/system"
     log_prefix="[Root Mode]"
 else
     IS_ROOT=false
-    BASE_HOME="/opt/nexus"
-    DATA_DIR="/opt/nexus-data"
     SCTL="systemctl --user"
     SVC_DIR="${HOME}/.config/systemd/user"
     log_prefix="[Rootless Mode]"
@@ -37,8 +35,8 @@ fi
 
 SSL_PATH="${BASE_HOME}/nexus-etc-ssl"
 ENV_PATH="${BASE_HOME}/nexus-env"
-SOURCE_CRT="$PWD/server_certs/${NEXUS_HOST_NAME}.crt"
-SOURCE_KEY="$PWD/server_certs/${NEXUS_HOST_NAME}.key"
+SOURCE_CRT="$PWD/certs/server_certs/${NEXUS_HOST_NAME}.crt"
+SOURCE_KEY="$PWD/certs/server_certs/${NEXUS_HOST_NAME}.key"
 
 log() { printf "%-15s %-10s %-70s\n" "$log_prefix" "[$1]" "$2"; }
 
@@ -98,9 +96,17 @@ if [[ ! -f "$P12_PATH" ]]; then
 fi
 
 # 2) JKS 변환
-podman run --rm -v "${SSL_PATH}:/ssl:Z" --entrypoint keytool "$NEXUS_IMAGE" \
-    -importkeystore -srckeystore "/ssl/nexus.p12" -srcstoretype PKCS12 \
-    -destkeystore "/ssl/keystore.jks" -deststoretype JKS \
+if ! command -v keytool &> /dev/null; then
+    log "INFO" "keytool 명령어가 없어 java-17-openjdk-headless 패키지를 설치합니다."
+    if [ "$IS_ROOT" = true ]; then
+        dnf install -y java-17-openjdk-headless
+    else
+        sudo dnf install -y java-17-openjdk-headless
+    fi
+fi
+
+keytool -importkeystore -srckeystore "$P12_PATH" -srcstoretype PKCS12 \
+    -destkeystore "$JKS_PATH" -deststoretype JKS \
     -srcstorepass password -deststorepass password -noprompt >/dev/null 2>&1
 
 # [추가] JKS 변환 확인
@@ -156,11 +162,15 @@ podman run -d \
     "$NEXUS_IMAGE"
 
 pushd "$SVC_DIR" > /dev/null
-podman generate systemd --new --files --name nexus >/dev/null
+podman generate systemd --new --files --name nexus --output-directory "$SVC_DIR"
+if [ -f "${SVC_DIR}/container-nexus.service" ]; then
+  $SCTL daemon-reload
+  $SCTL enable --now container-nexus.service
+else
+  echo "[ERROR] systemd 유닛 생성 실패"
+  exit 1
+fi
 popd > /dev/null
-
-$SCTL daemon-reload
-$SCTL enable --now container-nexus.service
 
 ### ==============================================================================
 ### 7. 마무리 및 초기 비밀번호 출력

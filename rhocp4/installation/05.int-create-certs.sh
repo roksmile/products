@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # 1. 디렉토리 설정
-ROOT_DIR="./root_ca"
-SERVER_DIR="./server_certs"
+ROOT_DIR="$PWD/certs/root_ca"
+SERVER_DIR="$PWD/certs/server_certs"
 
 mkdir -p "$ROOT_DIR"
 mkdir -p "$SERVER_DIR"

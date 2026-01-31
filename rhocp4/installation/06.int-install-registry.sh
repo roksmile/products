@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ADMIN_PASSWORD="redhat"
+
 # 1. 도메인 입력 받기
 if [ -z "$1" ]; then
     read -p "사용할 도메인을 입력하세요 (예: registry.rok.lab): " DOMAIN
@@ -11,16 +13,16 @@ echo ">>> 설정 도메인: ${DOMAIN}"
 
 # 2. 디렉토리 생성
 echo ">>> 디렉토리 생성 중 (/opt/registry/...)"
-sudo mkdir -p /opt/registry/{auth,data,certs}
+mkdir -p /opt/registry/{auth,data,certs}
 
 # 3. 인증서 복사
 # 실행 위치의 ./server_certs/ 디렉토리에 인증서가 있다고 가정합니다.
 echo ">>> 인증서 복사 중..."
-if [ -f "./server_certs/${DOMAIN}.crt" ] && [ -f "./server_certs/${DOMAIN}.key" ]; then
-    sudo cp ./server_certs/${DOMAIN}.* /opt/registry/certs/
+if [ -f "./certs/server_certs/${DOMAIN}.crt" ] && [ -f "./certs/server_certs/${DOMAIN}.key" ]; then
+    cp ./certs/server_certs/${DOMAIN}.* /opt/registry/certs/
     # 내부 환경 설정용 파일명 표준화 (실행 시 참조용)
-    sudo cp ./server_certs/${DOMAIN}.crt /opt/registry/certs/registry.crt
-    sudo cp ./server_certs/${DOMAIN}.key /opt/registry/certs/registry.key
+    cp ./server_certs/${DOMAIN}.crt /opt/registry/certs/registry.crt
+    cp ./server_certs/${DOMAIN}.key /opt/registry/certs/registry.key
 else
     echo "오류: ./server_certs/${DOMAIN}.crt 또는 .key 파일이 없습니다."
     exit 1
@@ -28,11 +30,11 @@ fi
 
 # 4. 접속 계정 생성 (admin/redhat)
 echo ">>> 인증 계정 생성 중..."
-sudo htpasswd -bBc /opt/registry/auth/htpasswd admin redhat
+htpasswd -bBc /opt/registry/auth/htpasswd admin redhat
 
 # 5. Docker Config 생성 (~/.docker/config.json)
 echo ">>> Docker 인증 정보 설정 중..."
-AUTH_ENCODED=$(echo -n 'admin:redhat' | base64 -w0)
+AUTH_ENCODED=$(echo -n 'admin:${ADMIN_PASSWORD}' | base64 -w0)
 mkdir -p ~/.docker
 cat <<EOF > ~/.docker/config.json
 {
@@ -82,5 +84,6 @@ fi
 echo "--------------------------------------------------"
 echo "설치가 완료되었습니다."
 echo "Registry URL: https://${DOMAIN}:5000"
+echo "접속 계정: admin / ${ADMIN_PASSWORD}"
 echo "상태 확인: podman ps"
 echo "--------------------------------------------------"
