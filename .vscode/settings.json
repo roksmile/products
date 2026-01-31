@@ -6,15 +6,21 @@
         "gitops",
         "healthcheck",
         "hyperconverged",
+        "idms",
         "keyid",
+        "kubelet",
+        "kubeletconfig",
         "kubevirt",
         "lvms",
+        "machineconfiguration",
         "metallb",
         "netobserv",
         "nmstate",
         "noout",
         "oadp",
+        "operatorhub",
         "rhbk",
-        "RHOV"
+        "RHOV",
+        "tableid"
     ]
 }

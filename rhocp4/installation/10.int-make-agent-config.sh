@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
+# 설정 파일 경로 확인 및 로드
 CONFIG_FILE="$(dirname "$(realpath "$0")")/00.ocp-nodes-info.sh"
 if [[ ! -f "$CONFIG_FILE" ]]; then
     printf "%-8s%-80s\n" "[ERROR]" "Configuration file '$CONFIG_FILE' not found. Exiting..."
@@ -7,47 +8,55 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 source "$CONFIG_FILE"
 
-AGENT_CONFIG_DIR="${CONFIG_DIR}/orig/agent-config.yaml"
+AGENT_CONFIG_FILE="${CONFIG_DIR}/orig/agent-config.yaml"
 
-cat > "$AGENT_CONFIG_DIR" << EOF
-apiVersion: v2alpha1
+# 1. 파일 초기화 및 헤더 작성
+cat > "${AGENT_CONFIG_FILE}" << EOF
+apiVersion: v1beta1
 kind: AgentConfig
+metadata:
+  name: ${CLUSTER_NAME}
 additionalNTPSources:
-    ${NTP_SERVERS[@]}
+$(for ntp in "${NTP_SERVERS[@]}"; do echo "  - $ntp"; done)
 rendezvousIP: ${RENDEZVOUS_IP}
 hosts:
 EOF
 
+# 2. 노드 리스트 순회하며 호스트 설정 추가
 for node in "${NODE_INFO_LIST[@]}" 
 do
-    IFS='--' read -r role hostname interface_name mac_address ip_address prefix_length gateway_ip <<< "$node"
-cat >> "$AGENT_CONFIG_DIR" << EOF
+    # 00.ocp-nodes-info.sh의 형식: role--hostname--interface--mac--ip--prefix--dns--gateway
+    IFS='--' read -r role hostname interface mac ip_address prefix gateway tableid <<< "$node"
+
+cat >> "$AGENT_CONFIG_FILE" << EOF
   - hostname: ${hostname}
     role: ${role}
     interfaces:
-      - name: ${interface_name}
-        macAddress: ${mac_address}
-    networkConfig: 
-        interfaces: 
-          - name: ${interface_name}
-            type: ethernet 
-            state: up
-            mac-address: ${mac_address}
-            ipv4:
-                address:
-                  - ip: ${ip_address}
-                    prefix-length: ${prefix_length} 
-                dhcp: false
-                enabled: true
-        dns-resolver:
-            config:
-            server:
-                ${DNS_SERVERS[@]}
-        routes:
-            config:
-              - destination: 0.0.0.0/0
-                next-hop-address: ${gateway_ip}
-                next-hop-interface: ${interface_name}
-                table-id: 254
+      - name: ${interface}
+        macAddress: ${mac}
+    networkConfig:
+      interfaces:
+        - name: ${interface}
+          type: ethernet
+          state: up
+          mac-address: ${mac}
+          ipv4:
+            enabled: true
+            address:
+              - ip: ${ip_address}
+                prefix-length: ${prefix}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            ${DNS_SERVER}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: ${gateway}
+            next-hop-interface: ${interface}
+            table-id: ${tableid}
 EOF
 done
+
+echo "Success: $AGENT_CONFIG_FILE has been generated."
