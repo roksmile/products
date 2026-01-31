@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# 설정 파일 경로 확인 및 로드
+CONFIG_FILE="$(dirname "$(realpath "$0")")/00.ocp-nodes-info.sh"
+if [[ ! -f "$CONFIG_FILE" ]]; then
+    printf "%-8s%-80s\n" "[ERROR]" "Configuration file '$CONFIG_FILE' not found. Exiting..."
+    exit 1
+fi
+source "$CONFIG_FILE"
+
+if [[ ! -d "${CONFIG_DIR}/openshift" ]]; then
+    mkdir -p "${CONFIG_DIR}/openshift"
+fi
+
 # operatorhub-disabled.yaml 생성
 OUTPUT_FILE="${CONFIG_DIR}/openshift/operatorhub-disabled.yaml"
 cat > "${OUTPUT_FILE}" << EOF
