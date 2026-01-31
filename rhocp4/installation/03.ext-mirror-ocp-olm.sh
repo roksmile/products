@@ -42,7 +42,7 @@ echo "선택된 대상: $TARGET_NAME"
 
 # 3. Pull Secret 파일 존재 여부 확인
 if [ ! -f "$PULL_SECRET" ]; then
-    echo "[오류] $PULL_SECRET 파일을 찾을 수 없습니다."
+    echo "[오류] ./pull-secret.txt 파일을 찾을 수 없습니다."
     echo "https://console.redhat.com/openshift/downloads 에서 다운 받으세요."
     exit 1
 fi

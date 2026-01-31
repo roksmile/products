@@ -22,8 +22,11 @@ REDHAT_PKGS=(
   "web-terminal"
   "servicemeshoperator3"
 )
+
 CERTIFIED_PKGS=(
-  "elasticsearch-eck-operator-certified")
+  "elasticsearch-eck-operator-certified"
+)
+
 RHOV_PKGS=(
   "kubevirt-hyperconverged"
   "local-storage-operator"
@@ -67,6 +70,10 @@ fetch_catalog_list() {
         echo "오류: 카탈로그 정보를 가져오는데 실패했습니다."
         return 1
     fi
+    # 예시: 특정 오퍼레이터의 기본 채널 추출 방법
+    # opm render registry.redhat.io/redhat/redhat-operator-index:v4.20 -o json > catalog.json
+    # grep '"schema": "olm.package"' -A2 catalog.json |grep 'cincinnati-operator' -A1|grep default|awk -F\" '{ print $4 }' 
+    
 }
 
 # Operator Channel 추출 함수
