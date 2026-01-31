@@ -29,6 +29,33 @@ NTP_SERVERS=(
     "10.60.1.22"
 )
 
+DNS_SERVERS=(
+    "10.60.1.21"
+    "10.60.1.22"
+)
+
 REGISTRY_ADMIN_USER="admin"
 REGISTRY_ADMIN_PWD="redhat"
 REGISTRY_ADDRESS="nexus.rok.lab:5000"
+
+CONFIG_DIR="$PWD/${CLUSTER_NAME}"
+
+# MASTER_COUNT, WORKER_COUNT, INFRA_COUNT, LOGGING_COUNT 계산 (NODE_INFO_LIST 기반)
+# - 역할 필드(항목의 첫 번째 필드)를 소문자로 비교해 카운트합니다.
+MASTER_COUNT=0
+WORKER_COUNT=0
+INFRA_COUNT=0
+LOGGING_COUNT=0
+for entry in "${NODE_INFO_LIST[@]}"; do
+  role="${entry%%--*}"
+  role_lc=$(echo "$role" | tr '[:upper:]' '[:lower:]')
+  case "$role_lc" in
+    master)   ((MASTER_COUNT++))  ;;
+    worker)   ((WORKER_COUNT++))  ;;
+    infra)    ((INFRA_COUNT++))   ;;
+    logging)  ((LOGGING_COUNT++)) ;;
+    *) ;;
+  esac
+done
+# export for downstream scripts that may source this file
+export MASTER_COUNT WORKER_COUNT INFRA_COUNT LOGGING_COUNT

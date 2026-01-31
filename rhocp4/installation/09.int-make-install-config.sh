@@ -7,26 +7,11 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 source "$CONFIG_FILE"
 
-# MASTER_COUNT, WORKER_COUNT, INFRA_COUNT, LOGGING_COUNT 계산 (NODE_INFO_LIST 기반)
-# - 역할 필드(항목의 첫 번째 필드)를 소문자로 비교해 카운트합니다.
-MASTER_COUNT=0
-WORKER_COUNT=0
-INFRA_COUNT=0
-LOGGING_COUNT=0
-for entry in "${NODE_INFO_LIST[@]}"; do
-  role="${entry%%--*}"
-  role_lc=$(echo "$role" | tr '[:upper:]' '[:lower:]')
-  case "$role_lc" in
-    master)   ((MASTER_COUNT++))  ;;
-    worker)   ((WORKER_COUNT++))  ;;
-    infra)    ((INFRA_COUNT++))   ;;
-    logging)  ((LOGGING_COUNT++)) ;;
-    *) ;;
-  esac
-done
-# export for downstream scripts that may source this file
-export MASTER_COUNT WORKER_COUNT INFRA_COUNT LOGGING_COUNT
+mkdir -p "${CONFIG_DIR}/{orig,openshift}"
 
+# install-config.yaml 생성
+INSTALL_CONFIG_PATH="${CONFIG_DIR}/orig/install-config.yaml"
+cat > "$INSTALL_CONFIG_PATH" << EOF
 apiVersion: v1
 baseDomain: ${BASE_DOMAIN}
 compute:
@@ -73,3 +58,4 @@ imageDigestSources:
 - mirrors:
   - ${REGISTRY_ADDRESS}/ocp4/openshift/release
   source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+EOF 
