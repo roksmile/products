@@ -60,17 +60,40 @@ done
 echo "--- oc-mirror 설치 중 (/usr/local/bin) ---"
 if [ -f "${TARGET_DIR}/${MIRROR_FILE}" ]; then
     # /usr/local/bin에 압축 해제 (sudo 권한 필요할 수 있음)
-    sudo tar -xzf "${TARGET_DIR}/${MIRROR_FILE}" -C "$BIN_DIR"
+    tar -xzf "${TARGET_DIR}/${MIRROR_FILE}" -C "$BIN_DIR"
     
     if [ $? -eq 0 ]; then
         # 퍼미션 755 변경
-        sudo chmod 755 "${BIN_DIR}/oc-mirror"
+        chmod 755 "${BIN_DIR}/oc-mirror"
         echo "성공: oc-mirror가 ${BIN_DIR}에 설치되었으며 권한이 755로 설정되었습니다."
     else
         echo "오류: 압축 해제에 실패했습니다."
     fi
 else
     echo "오류: 압축을 풀 파일(${MIRROR_FILE})이 존재하지 않습니다."
+fi
+
+# 7. opm 압축 해제 및 퍼미션 설정
+echo "--- op 설치 중 (/usr/local/bin) ---"
+if [ -f "${TARGET_DIR}/${OPM_FILE}" ]; then
+    # /usr/local/bin에 압축 해제 (sudo 권한 필요할 수 있음)
+    tar -xzf "${TARGET_DIR}/${OPM_FILE}" -C "$BIN_DIR"
+    
+    if [ $? -eq 0 ]; then
+        # 퍼미션 755 변경
+        if [ -f "${BIN_DIR}/opm-rhel8" ]; then
+            mv ${BIN_DIR}/opm-rhel8 "${BIN_DIR}/opm"
+        fi
+        if [ -f "${BIN_DIR}/opm-rhel9" ]; then
+            mv ${BIN_DIR}/opm-rhel9 "${BIN_DIR}/opm"
+        fi
+        chmod 755 "${BIN_DIR}/opm"
+        echo "성공: opm 이 ${BIN_DIR}에 설치되었으며 권한이 755로 설정되었습니다."
+    else
+        echo "오류: 압축 해제에 실패했습니다."
+    fi
+else
+    echo "오류: 압축을 풀 파일(${OPM_FILE})이 존재하지 않습니다."
 fi
 
 echo "--- 모든 작업이 완료되었습니다. ---"

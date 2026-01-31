@@ -1,0 +1,26 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+mirror:
+  operators:
+  - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
+  packages:
+  - name: cincinnati-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: kubevirt-hyperconverged
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: local-storage-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: metallb-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: mtc-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: mtv-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: redhat-oadp-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: fence-agents-remediation
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: lvms-operator
+    # 채널 조회 실패 — 채널 지정 없이 추가함
+  - name: machine-deletion-remediation
+    # 채널 조회 실패 — 채널 지정 없이 추가함
