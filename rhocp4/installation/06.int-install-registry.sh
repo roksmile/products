@@ -1,19 +1,24 @@
 #!/bin/bash
 
-# 1. 도메인 입력 받기
-if [ -z "$1" ]; then
-    read -p "사용할 도메인을 입력하세요 (예: registry.rok.lab): " DOMAIN
-else
-    DOMAIN=$1
-fi
+### ==============================================================================
+### 1. 전역 설정 및 입력 받기
+### ==============================================================================
+# Nexus Host Name 입력 및 유효성 체크
+read -p "Nexus Host Name을 입력하세요 (예: registry.kdneri.com): " REGISTRY_DOMAIN
+REGISTRY_DOMAIN=${REGISTRY_DOMAIN:-registry.kdneri.com}
 
-echo ">>> 설정 도메인: ${DOMAIN}"
+DOMAIN_REGEX="^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
+if [[ ! $REGISTRY_DOMAIN =~ $DOMAIN_REGEX ]]; then
+    echo "[ERROR] 유효하지 않은 도메인 형식입니다: $REGISTRY_DOMAIN"
+    exit 1
+fi
+echo ">>> 설정 도메인: ${REGISTRY_DOMAIN}"
 
 BASE_HOME="/opt/registry"
 PORT="5000"
 ADMIN_PASSWORD="redhat"
-DOMAIN_CRT="$PWD/certs/server_certs/${DOMAIN}.crt"
-DOMAIN_KEY="$PWD/certs/server_certs/${DOMAIN}.key"
+DOMAIN_CRT="$PWD/certs/server_certs/${REGISTRY_DOMAIN}.crt"
+DOMAIN_KEY="$PWD/certs/server_certs/${REGISTRY_DOMAIN}.key"
 
 if ! command -v htpasswd &> /dev/null; then
   echo "htpasswd 명령어가 없습니다. 설치를 시작합니다."
@@ -21,8 +26,8 @@ if ! command -v htpasswd &> /dev/null; then
 fi
 
 # 2. 디렉토리 생성
-echo ">>> 디렉토리 생성 중 (/${BASE_HOME}/...)"
-mkdir -p /${BASE_HOME}/{auth,data,certs}
+echo ">>> 디렉토리 생성 중 (${BASE_HOME}/...)"
+mkdir -p ${BASE_HOME}/{auth,data,certs}
 
 # 3. 인증서 복사
 # 실행 위치의 ./server_certs/ 디렉토리에 인증서가 있다고 가정합니다.
@@ -38,7 +43,7 @@ fi
 
 # 4. 접속 계정 생성 (admin/redhat)
 echo ">>> 인증 계정 생성 중..."
-htpasswd -bBc /${BASE_HOME}/auth/htpasswd admin redhat
+htpasswd -bBc ${BASE_HOME}/auth/htpasswd admin redhat
 
 # 5. Docker Config 생성 (~/.docker/config.json)
 echo ">>> Docker 인증 정보 설정 중..."
@@ -60,11 +65,11 @@ podman rm -f mirror-registry 2>/dev/null
 
 # 7. Registry 실행
 echo ">>> Registry 컨테이너 실행 중..."
-podman run -d --rm --name mirror-registry \
+podman run -d --rm --name registry \
   -p ${PORT}:5000 \
-  -v /${BASE_HOME}/data:/var/lib/registry:z \
-  -v /${BASE_HOME}/auth:/auth:z \
-  -v /${BASE_HOME}/certs:/certs:z \
+  -v ${BASE_HOME}/data:/var/lib/registry:z \
+  -v ${BASE_HOME}/auth:/auth:z \
+  -v ${BASE_HOME}/certs:/certs:z \
   -e REGISTRY_AUTH=htpasswd \
   -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
   -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
@@ -75,12 +80,10 @@ podman run -d --rm --name mirror-registry \
 
 # 8. systemd 서비스 등록
 echo ">>> systemd 서비스 등록 중..."
-mkdir -p ~/.config/systemd/user
-podman generate systemd --name mirror-registry --new --files --name
+podman generate systemd --new --name registry > "/etc/systemd/system/registry.service"
 # 생성된 .service 파일을 systemd 경로로 이동 및 활성화
-mv container-mirror-registry.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now container-mirror-registry.service
+systemctl daemon-reload
+systemctl enable --now registry.service
 
 # 9. 방화벽 오픈 (firewalld가 실행 중인 경우)
 if systemctl is-active --quiet firewalld; then
@@ -91,7 +94,7 @@ fi
 
 echo "--------------------------------------------------"
 echo "설치가 완료되었습니다."
-echo "Registry URL: https://${DOMAIN}:${PORT}"
+echo "Registry URL: https://${REGISTRY_DOMAIN}:${PORT}"
 echo "접속 계정: admin / ${ADMIN_PASSWORD}"
 echo "상태 확인: podman ps"
 echo "--------------------------------------------------"

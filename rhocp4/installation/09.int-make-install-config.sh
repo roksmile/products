@@ -17,7 +17,7 @@ mkdir -p "${CONFIG_DIR}/openshift"
 AUTH_BASE64=$(echo -n "${REGISTRY_ADMIN_USER}:${REGISTRY_ADMIN_PWD}" | base64 -w0)
 
 # 2. SSH Keys 및 추가 인증서 처리 (들여쓰기 최적화)
-SSH_KEYS_FORMATTED=$(for key in "${SSH_KEYS[@]}"; do echo "- $key"; done)
+SSH_KEYS_FORMATTED=$(for key in "${SSH_KEYS[@]}"; do echo " - $key"; done)
 
 if [[ ! -f ./certs/root_ca/rootCA.crt ]]; then
     echo "[WARNING] ./certs/root_ca/rootCA.crt 파일이 없습니다. "
@@ -55,7 +55,7 @@ platform:
   none: {}
 fips: false
 pullSecret: '{"auths":{"${REGISTRY_ADDRESS}":{"auth":"${AUTH_BASE64}","email":"rkim@redhat.com"}}}'
-sshKey: 
+sshKey: |
 ${SSH_KEYS_FORMATTED}
 additionalTrustBundle: |
 ${TRUSTED_CA}

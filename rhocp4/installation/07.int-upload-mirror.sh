@@ -5,15 +5,9 @@ echo -e "    OpenShift Mirroring Script (v2)       "
 echo -e "=========================================="
 
 # 1. 이미지 레지스트리 정보 입력 받기
-DEFAULT_REGISTRY="nexus.rok.lab:5000"
-echo -e "${YELLOW}[Registry 설정]${NC}"
-echo -p "대상 레지스트리 주소를 입력하세요 (기본값: $DEFAULT_REGISTRY): " TARGET_REGISTRY
-read TARGET_REGISTRY
-
-# 입력이 없으면 기본값 사용
-if [ -z "$TARGET_REGISTRY" ]; then
-    TARGET_REGISTRY=$DEFAULT_REGISTRY
-fi
+echo -e "[Registry 설정]"
+read -p "컨테이너 이미지 레지스트리 주소를 입력하세요 (기본값: nexus.kdneri.com:5000): " TARGET_REGISTRY
+TARGET_REGISTRY=${TARGET_REGISTRY:-nexus.kdneri.com:5000}
 
 echo -e ">> 목적지 레지스트리: $TARGET_REGISTRY\n"
 

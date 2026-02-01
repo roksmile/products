@@ -5,6 +5,7 @@
 ### ==============================================================================
 # Nexus Host Name 입력 및 유효성 체크
 read -p "Nexus Host Name을 입력하세요 (예: nexus.kdneri.com): " NEXUS_HOST_NAME
+NEXUS_HOST_NAME=${NEXUS_HOST_NAME:-nexus.kdneri.com}
 
 DOMAIN_REGEX="^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
 if [[ ! $NEXUS_HOST_NAME =~ $DOMAIN_REGEX ]]; then
@@ -161,10 +162,10 @@ podman run -d \
     "$NEXUS_IMAGE"
 
 pushd "$SVC_DIR" > /dev/null
-podman generate systemd --new --files --name nexus --output-directory "$SVC_DIR"
-if [ -f "${SVC_DIR}/container-nexus.service" ]; then
+podman generate systemd --new --name nexus > "$SVC_DIR/nexus.service"
+if [ -f "${SVC_DIR}/nexus.service" ]; then
   $SCTL daemon-reload
-  $SCTL enable --now container-nexus.service
+  $SCTL enable --now nexus.service
 else
   echo "[ERROR] systemd 유닛 생성 실패"
   exit 1

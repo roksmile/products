@@ -8,25 +8,31 @@ if [[ ! -f "$CONFIG_FILE" ]]; then
 fi
 source "$CONFIG_FILE"
 
+mkdir -p ${CONFIG_DIR}/orig
 AGENT_CONFIG_FILE="${CONFIG_DIR}/orig/agent-config.yaml"
 
 # 1. 파일 초기화 및 헤더 작성
 cat > "${AGENT_CONFIG_FILE}" << EOF
 apiVersion: v1beta1
 kind: AgentConfig
-metadata:
-  name: ${CLUSTER_NAME}
+rendezvousIP: ${RENDEZVOUS_IP}
 additionalNTPSources:
 $(for ntp in "${NTP_SERVERS[@]}"; do echo "  - $ntp"; done)
-rendezvousIP: ${RENDEZVOUS_IP}
 hosts:
 EOF
 
 # 2. 노드 리스트 순회하며 호스트 설정 추가
 for node in "${NODE_INFO_LIST[@]}" 
 do
-    # 00.ocp-nodes-info.sh의 형식: role--hostname--interface--mac--ip--prefix--dns--gateway
-    IFS='--' read -r role hostname interface mac ip_address prefix gateway tableid <<< "$node"
+# awk를 사용하여 안전하게 필드 분리 (구분자 --)
+    role=$(echo "$node" | awk -F'--' '{print $1}')
+    hostname=$(echo "$node" | awk -F'--' '{print $2}')
+    interface=$(echo "$node" | awk -F'--' '{print $3}')
+    mac=$(echo "$node" | awk -F'--' '{print $4}')
+    ip_address=$(echo "$node" | awk -F'--' '{print $5}')
+    prefix=$(echo "$node" | awk -F'--' '{print $6}')
+    gateway=$(echo "$node" | awk -F'--' '{print $7}')
+    tableid=$(echo "$node" | awk -F'--' '{print $8}')
 
 cat >> "$AGENT_CONFIG_FILE" << EOF
   - hostname: ${hostname}
@@ -49,7 +55,7 @@ cat >> "$AGENT_CONFIG_FILE" << EOF
       dns-resolver:
         config:
           server:
-            ${DNS_SERVER}
+$(for dns in "${DNS_SERVERS[@]}"; do echo "            - $dns"; done)
       routes:
         config:
           - destination: 0.0.0.0/0
