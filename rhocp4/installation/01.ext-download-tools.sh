@@ -1,13 +1,9 @@
 #!/bin/bash
 
-# 1. 설치할 버전 입력 받기
-echo -n "설치할 OpenShift 버전을 입력하세요 (예: 4.14.35): "
-read VERSION
-
-if [ -z "$VERSION" ]; then
-    echo "오류: 버전을 입력해야 합니다."
-    exit 1
-fi
+# 1. OCP 버전 입력 (기본값: 4.20.10)
+read -p "OCP 버전을 입력하세요 (default: 4.20.10): " OCP_VERSION
+OCP_VERSION=${OCP_VERSION:-4.20.10}
+SHORT_VER=$(echo $OCP_VERSION | cut -d. -f1-2)
 
 # 2. OS 버전 확인
 if [ -f /etc/os-release ]; then

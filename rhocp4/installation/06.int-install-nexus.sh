@@ -4,8 +4,7 @@
 ### 1. 전역 설정 및 입력 받기
 ### ==============================================================================
 # Nexus Host Name 입력 및 유효성 체크
-printf "Nexus Host Name을 입력하세요 (예: nexus.kdneri.com): "
-read NEXUS_HOST_NAME
+read -p "Nexus Host Name을 입력하세요 (예: nexus.kdneri.com): " NEXUS_HOST_NAME
 
 DOMAIN_REGEX="^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
 if [[ ! $NEXUS_HOST_NAME =~ $DOMAIN_REGEX ]]; then

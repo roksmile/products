@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ADMIN_PASSWORD="redhat"
-
 # 1. 도메인 입력 받기
 if [ -z "$1" ]; then
     read -p "사용할 도메인을 입력하세요 (예: registry.rok.lab): " DOMAIN
@@ -11,35 +9,45 @@ fi
 
 echo ">>> 설정 도메인: ${DOMAIN}"
 
+BASE_HOME="/opt/registry"
+PORT="5000"
+ADMIN_PASSWORD="redhat"
+DOMAIN_CRT="$PWD/certs/server_certs/${DOMAIN}.crt"
+DOMAIN_KEY="$PWD/certs/server_certs/${DOMAIN}.key"
+
+if ! command -v htpasswd &> /dev/null; then
+  echo "htpasswd 명령어가 없습니다. 설치를 시작합니다."
+  dnf install -y httpd-tools
+fi
+
 # 2. 디렉토리 생성
-echo ">>> 디렉토리 생성 중 (/opt/registry/...)"
-mkdir -p /opt/registry/{auth,data,certs}
+echo ">>> 디렉토리 생성 중 (/${BASE_HOME}/...)"
+mkdir -p /${BASE_HOME}/{auth,data,certs}
 
 # 3. 인증서 복사
 # 실행 위치의 ./server_certs/ 디렉토리에 인증서가 있다고 가정합니다.
 echo ">>> 인증서 복사 중..."
-if [ -f "./certs/server_certs/${DOMAIN}.crt" ] && [ -f "./certs/server_certs/${DOMAIN}.key" ]; then
-    cp ./certs/server_certs/${DOMAIN}.* /opt/registry/certs/
+if [ -f "${DOMAIN_CRT}" ] && [ -f "${DOMAIN_KEY}" ]; then
     # 내부 환경 설정용 파일명 표준화 (실행 시 참조용)
-    cp ./server_certs/${DOMAIN}.crt /opt/registry/certs/registry.crt
-    cp ./server_certs/${DOMAIN}.key /opt/registry/certs/registry.key
+    cp ${DOMAIN_CRT} ${BASE_HOME}/certs/registry.crt
+    cp ${DOMAIN_KEY} ${BASE_HOME}/certs/registry.key
 else
-    echo "오류: ./server_certs/${DOMAIN}.crt 또는 .key 파일이 없습니다."
+    echo "오류: ${DOMAIN_CRT} 또는 ${DOMAIN_KEY} 파일이 없습니다."
     exit 1
 fi
 
 # 4. 접속 계정 생성 (admin/redhat)
 echo ">>> 인증 계정 생성 중..."
-htpasswd -bBc /opt/registry/auth/htpasswd admin redhat
+htpasswd -bBc /${BASE_HOME}/auth/htpasswd admin redhat
 
 # 5. Docker Config 생성 (~/.docker/config.json)
 echo ">>> Docker 인증 정보 설정 중..."
-AUTH_ENCODED=$(echo -n 'admin:${ADMIN_PASSWORD}' | base64 -w0)
+AUTH_ENCODED=$(echo -n "admin:${ADMIN_PASSWORD}" | base64 -w0)
 mkdir -p ~/.docker
 cat <<EOF > ~/.docker/config.json
 {
   "auths": {
-    "${DOMAIN}:5000": {
+    "${DOMAIN}:${PORT}": {
       "auth": "${AUTH_ENCODED}",
       "email": "rkim@redhat.com"
     }
@@ -52,11 +60,11 @@ podman rm -f mirror-registry 2>/dev/null
 
 # 7. Registry 실행
 echo ">>> Registry 컨테이너 실행 중..."
-podman run -d --name mirror-registry \
-  -p 5000:5000 \
-  -v /opt/registry/data:/var/lib/registry:z \
-  -v /opt/registry/auth:/auth:z \
-  -v /opt/registry/certs:/certs:z \
+podman run -d --rm --name mirror-registry \
+  -p ${PORT}:5000 \
+  -v /${BASE_HOME}/data:/var/lib/registry:z \
+  -v /${BASE_HOME}/auth:/auth:z \
+  -v /${BASE_HOME}/certs:/certs:z \
   -e REGISTRY_AUTH=htpasswd \
   -e REGISTRY_AUTH_HTPASSWD_REALM="Registry Realm" \
   -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
@@ -76,14 +84,14 @@ systemctl --user enable --now container-mirror-registry.service
 
 # 9. 방화벽 오픈 (firewalld가 실행 중인 경우)
 if systemctl is-active --quiet firewalld; then
-    echo ">>> 방화벽 5000번 포트 오픈 중..."
-    sudo firewall-cmd --add-port=5000/tcp --permanent
+    echo ">>> 방화벽 ${PORT}번 포트 오픈 중..."
+    sudo firewall-cmd --add-port=${PORT}/tcp --permanent
     sudo firewall-cmd --reload
 fi
 
 echo "--------------------------------------------------"
 echo "설치가 완료되었습니다."
-echo "Registry URL: https://${DOMAIN}:5000"
+echo "Registry URL: https://${DOMAIN}:${PORT}"
 echo "접속 계정: admin / ${ADMIN_PASSWORD}"
 echo "상태 확인: podman ps"
 echo "--------------------------------------------------"
