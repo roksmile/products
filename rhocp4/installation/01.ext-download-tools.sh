@@ -21,24 +21,24 @@ mkdir -p "$TARGET_DIR"
 # 4. OS별 변수 및 URL 설정
 DOWNLOAD_LIST=(
     "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/butane/latest/butane-amd64"
-    "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/openshift-install-linux.tar.gz"
+    "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/openshift-install-linux.tar.gz"
 )
 
 if [ "$OS_MAJOR_VERSION" == "9" ]; then
     OPM_FILE="opm-linux-rhel9.tar.gz"
     MIRROR_FILE="oc-mirror.rhel9.tar.gz"
     CLIENT_FILE="openshift-client-linux-amd64-rhel9.tar.gz"
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${OPM_FILE}")
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${CLIENT_FILE}")
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${MIRROR_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${OPM_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${CLIENT_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${MIRROR_FILE}")
     
 elif [ "$OS_MAJOR_VERSION" == "8" ]; then
     OPM_FILE="opm-linux.tar.gz"
     MIRROR_FILE="oc-mirror.tar.gz"
     CLIENT_FILE="openshift-client-linux-amd64-rhel8.tar.gz"
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${OPM_FILE}")
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${CLIENT_FILE}")
-    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${VERSION}/${MIRROR_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${OPM_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${CLIENT_FILE}")
+    DOWNLOAD_LIST+=("https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/${OCP_VERSION}/${MIRROR_FILE}")
 else
     echo "오류: RHEL 8 또는 9만 지원합니다."
     exit 1
