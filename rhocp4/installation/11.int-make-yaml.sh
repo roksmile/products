@@ -13,7 +13,7 @@ if [[ ! -d "${CONFIG_DIR}/openshift" ]]; then
 fi
 
 # 컨테이너 이미지 레지스트리 주소
-read -p "컨테이너 이미지 레지스트리 주소를 입력하세요 (예: ${REGISTRY_ADDRESS}): " REGISTRY_ADDRESS
+echo "컨테이너 이미지 레지스트리 주소: ${REGISTRY_ADDRESS})"
 
 # operatorhub-disabled.yaml 생성
 OUTPUT_FILE="${CONFIG_DIR}/openshift/operatorhub-disabled.yaml"
