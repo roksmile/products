@@ -12,11 +12,14 @@ SERVICE_NETWORK="172.30.0.0/16"
 CLUSTER_NETWORK="10.128.0.0/14"
 
 NODE_INFO_LIST=(
-    "master--mst01.kdneri.com--enp1s0--10:54:00:7d:e1:11--172.16.120.111--24--172.16.120.29--254"
-    "master--mst02.kdneri.com--enp1s0--10:54:00:7d:e1:12--172.16.120.112--24--172.16.120.29--254"
-    "master--mst03.kdneri.com--enp1s0--10:54:00:7d:e1:13--172.16.120.113--24--172.16.120.29--254"
-    "worker--ifr01.kdneri.com--enp1s0--10:54:00:7d:e1:21--172.16.120.121--24--172.16.120.29--254"
-    "worker--ifr02.kdneri.com--enp1s0--10:54:00:7d:e1:22--172.16.120.122--24--172.16.120.29--254"
+    "master--mst01.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:11--10.60.1.29--24--10.60.1.1--254"
+    "master--mst02.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:12--10.60.1.30--24--10.60.1.1--254"
+    "master--mst03.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:13--10.60.1.31--24--10.60.1.1--254"
+)
+ADD_NODE_INFO_LIST=(
+    "worker--ifr01.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:21--10.60.1.40--24--10.60.1.1--254"
+    "worker--ifr02.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:22--10.60.1.41--24--10.60.1.1--254"
+    "worker--ifr03.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:22--10.60.1.42--24--10.60.1.1--254"
 )
 
 SSH_KEYS=(
