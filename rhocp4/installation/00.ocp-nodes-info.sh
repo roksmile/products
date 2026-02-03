@@ -12,9 +12,9 @@ SERVICE_NETWORK="172.30.0.0/16"
 CLUSTER_NETWORK="10.128.0.0/14"
 
 NODE_INFO_LIST=(
-    "master--mst01.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:11--10.60.1.29--24--10.60.1.1--254"
-    "master--mst02.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:12--10.60.1.30--24--10.60.1.1--254"
-    "master--mst03.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:13--10.60.1.31--24--10.60.1.1--254"
+    "master--mst01.kscada.kdneri.com--enp1s0--52:54:00:aa:e1:6e--10.60.1.29--24--10.60.1.1--254"
+    "master--mst02.kscada.kdneri.com--enp1s0--52:54:00:86:db:ae--10.60.1.30--24--10.60.1.1--254"
+    "master--mst03.kscada.kdneri.com--enp1s0--52:54:00:87:31:44--10.60.1.31--24--10.60.1.1--254"
 )
 ADD_NODE_INFO_LIST=(
     "worker--ifr01.kscada.kdneri.com--enp1s0--10:54:00:7d:e1:21--10.60.1.40--24--10.60.1.1--254"
@@ -25,6 +25,8 @@ ADD_NODE_INFO_LIST=(
 SSH_KEYS=(
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOR8VQW1SRoAm+79tw21Gg7hIiK7YwnxatIKISraUxVf roksmile@base.rok.lab"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICdUDFsFuk1JTCRKwAnhGS3jRJQvTdBfALs//pTRlEhC root@base.rok.lab"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBQ/NSEJaZEprH5WwIOgVKkZp77uUYI5oDQxSLrN37dG root@bastion01.kscada.kdneri.com"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICnX6ZwAleoi6KdmfmXTY9epMTlfGTdhLsy7daUK1ipS root@bastion02.kscada.kdneri.com"
 )
 
 NTP_SERVERS=(
@@ -39,7 +41,7 @@ DNS_SERVERS=(
 
 REGISTRY_ADMIN_USER="admin"
 REGISTRY_ADMIN_PWD="redhat"
-REGISTRY_ADDRESS="nexus.rok.lab:5000"
+REGISTRY_ADDRESS="ocp-registry.kscada.kdneri.com:5000"
 
 CONFIG_DIR="$PWD/${CLUSTER_NAME}"
 
